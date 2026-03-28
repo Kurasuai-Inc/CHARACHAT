@@ -159,7 +159,7 @@ function ChatWorkspace({
             </div>
           </div>
           {deskAvailability.available ? (
-            <div className="presencePill">今 CHARADESK でも直接話せます</div>
+            <div className="presencePill">CHARADESK が起動中です</div>
           ) : null}
         </header>
 
@@ -195,7 +195,7 @@ function ChatWorkspace({
           <div className="composerActions">
             <span className="muted">
               {deskAvailability.available
-                ? 'Desk も開いているので、必要ならそっちに切り替えても大丈夫です。'
+                ? 'Desk 側にもこの会話の新着が伝わります。'
                 : 'ここが一番軽い会話窓口です。'}
             </span>
             <button type="button" className="primary" disabled={busy || !selectedThreadId || !messageText.trim()} onClick={() => { void handleSend(); }}>
@@ -251,4 +251,3 @@ export function App() {
     </CHARAHOMEAuthProvider>
   );
 }
-

@@ -11,7 +11,7 @@ export interface ChatThread {
   archived: boolean;
   metadata?: {
     sessionId?: string;
-    lastDeskHintAtIso?: string;
+    lastDeskAttentionAtIso?: string;
   };
 }
 

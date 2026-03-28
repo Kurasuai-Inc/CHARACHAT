@@ -16,12 +16,12 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-function shouldInjectDeskHint(thread: ChatThread, availability: DeskAvailability) {
+function shouldNotifyDesk(thread: ChatThread, availability: DeskAvailability) {
   if (!availability.available) {
     return false;
   }
-  const lastHintAt = thread.metadata?.lastDeskHintAtIso ? Date.parse(thread.metadata.lastDeskHintAtIso) : 0;
-  return Number.isNaN(lastHintAt) || (Date.now() - lastHintAt) > 10 * 60_000;
+  const lastAttentionAt = thread.metadata?.lastDeskAttentionAtIso ? Date.parse(thread.metadata.lastDeskAttentionAtIso) : 0;
+  return Number.isNaN(lastAttentionAt) || (Date.now() - lastAttentionAt) > 10 * 60_000;
 }
 
 export class ChatThreadService {
@@ -102,10 +102,20 @@ export class ChatThreadService {
     });
 
     const deskAvailability = await this.getDeskAvailability(session, thread.defaultCharacterId);
-    const injectDeskHint = shouldInjectDeskHint(thread, deskAvailability);
-    const replyText = injectDeskHint
-      ? `今 CHARADESK が開いてるなら、そっちで直接話してくれてもいいよ。\n\n${conversationResult.responseText}`
-      : conversationResult.responseText;
+    const shouldCreateDeskAttention = shouldNotifyDesk(thread, deskAvailability);
+    if (shouldCreateDeskAttention) {
+      await this.deskPresenceClient.notifyAttention({
+        ownerCharahomeUid: session.charahomeUid,
+        characterId: thread.defaultCharacterId,
+        sourceClient: 'charachat',
+        sourceLabel: 'CHARACHAT',
+        contextId: thread.id,
+        previewText: input.text.trim(),
+        metadata: {
+          threadId: thread.id,
+        },
+      }).catch(() => ({ ok: false }));
+    }
 
     const replyMessage: ChatMessage = {
       id: `msg-${randomUUID()}`,
@@ -113,7 +123,7 @@ export class ChatThreadService {
       ownerCharahomeUid: session.charahomeUid,
       sender: 'CHARACTER',
       characterId: thread.defaultCharacterId,
-      text: replyText,
+      text: conversationResult.responseText,
       createdAtIso: nowIso(),
       metadata: {
         sessionId: conversationResult.sessionId,
@@ -125,7 +135,7 @@ export class ChatThreadService {
     thread.metadata = {
       ...(thread.metadata ?? {}),
       sessionId: conversationResult.sessionId,
-      lastDeskHintAtIso: injectDeskHint ? replyMessage.createdAtIso : thread.metadata?.lastDeskHintAtIso,
+      lastDeskAttentionAtIso: shouldCreateDeskAttention ? replyMessage.createdAtIso : thread.metadata?.lastDeskAttentionAtIso,
     };
 
     await this.store.appendMessages([userMessage, replyMessage]);
@@ -139,4 +149,3 @@ export class ChatThreadService {
     };
   }
 }
-

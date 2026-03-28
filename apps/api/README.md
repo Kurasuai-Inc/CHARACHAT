@@ -5,7 +5,7 @@ API responsibilities:
 - lightweight chat thread/message storage
 - CHARAHOME-derived auth validation
 - direct conversation turn execution
-- optional CHARADESK availability hint
+- optional CHARADESK attention handoff
 
 ## Endpoints
 
@@ -15,4 +15,3 @@ API responsibilities:
 - `GET /threads/:threadId/messages`
 - `POST /threads/:threadId/messages`
 - `GET /desk/availability`
-

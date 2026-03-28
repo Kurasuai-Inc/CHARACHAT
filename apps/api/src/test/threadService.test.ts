@@ -49,15 +49,16 @@ describe('ChatThreadService', () => {
     expect(result.deskAvailability.available).toBe(false);
   });
 
-  it('sends a message and injects a desk hint when CHARADESK is active', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+  it('sends a message and notifies CHARADESK when direct desk presence is active', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         ok: true,
         available: true,
         presence: [{ clientKind: 'WEB_CONTROL' }],
       }),
-    }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
 
     const service = new ChatThreadService(new FileChatThreadStore(storePath), {
       ...baseConfig,
@@ -71,8 +72,10 @@ describe('ChatThreadService', () => {
 
     const result = await service.sendMessage(thread.id, { text: 'こんにちは' }, session);
 
-    expect(result.replyMessage.text).toContain('今 CHARADESK が開いてるなら');
     expect(result.replyMessage.text).toContain('Character acknowledged');
     expect(result.deskAvailability.available).toBe(true);
+    const calledUrls = fetchMock.mock.calls
+      .map((call) => typeof call[0] === 'string' ? call[0] : '');
+    expect(calledUrls).toContain('https://desk.example.com/runtime/external/attention/user-1');
   });
 });

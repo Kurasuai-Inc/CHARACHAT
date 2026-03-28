@@ -5,6 +5,16 @@ export interface DeskAvailabilityResult {
   clientKinds: string[];
 }
 
+export interface DeskAttentionInput {
+  ownerCharahomeUid: string;
+  characterId?: string;
+  sourceClient: string;
+  sourceLabel: string;
+  contextId?: string;
+  previewText: string;
+  metadata?: Record<string, unknown>;
+}
+
 export class CharadeskPresenceClient {
   constructor(private readonly config: CharachatApiConfig) {}
 
@@ -44,6 +54,34 @@ export class CharadeskPresenceClient {
       clientKinds: presence
         .map((record) => typeof record.clientKind === 'string' ? record.clientKind : null)
         .filter((value): value is string => Boolean(value)),
+    };
+  }
+
+  async notifyAttention(input: DeskAttentionInput) {
+    if (!this.config.charadeskRuntimeBaseUrl || !this.config.charadeskSiblingSharedSecret) {
+      return { ok: false };
+    }
+
+    const response = await fetch(
+      `${this.config.charadeskRuntimeBaseUrl.replace(/\/$/, '')}/runtime/external/attention/${encodeURIComponent(input.ownerCharahomeUid)}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-charadesk-sibling-secret': this.config.charadeskSiblingSharedSecret,
+        },
+        body: JSON.stringify({
+          characterId: input.characterId,
+          sourceClient: input.sourceClient,
+          sourceLabel: input.sourceLabel,
+          contextId: input.contextId,
+          previewText: input.previewText,
+          metadata: input.metadata,
+        }),
+      },
+    );
+    return {
+      ok: response.ok,
     };
   }
 }

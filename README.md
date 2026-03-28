@@ -16,7 +16,7 @@
 - favorite character からすぐスレッド作成
 - lightweight な会話 UI
 - CHARAHOME ConversationAPI を使った direct conversation
-- `CHARADESK` が開いている時の “直接そっちで話せる” ヒント
+- `CHARADESK` が開いている時の Desk 側気づき連携
 
 ## Scripts
 
@@ -29,3 +29,6 @@ npm run test
 npm run build
 ```
 
+## Deploy
+
+Cloud Run への自動 deploy は [docs/CLOUD_RUN_DEPLOY.md](D:/ClaudeCode/projects/web/CHARACHAT/docs/CLOUD_RUN_DEPLOY.md) を参照してください。
