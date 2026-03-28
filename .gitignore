@@ -3,4 +3,9 @@ dist/
 .charachat-data/
 .env
 .env.local
-
+!vendor/charahome-js-sdks/packages/api/dist/
+!vendor/charahome-js-sdks/packages/api/dist/**
+!vendor/charahome-js-sdks/packages/auth/dist/
+!vendor/charahome-js-sdks/packages/auth/dist/**
+!vendor/charahome-js-sdks/packages/onboarding-minimal/dist/
+!vendor/charahome-js-sdks/packages/onboarding-minimal/dist/**
