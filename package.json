@@ -1,0 +1,21 @@
+{
+  "name": "charachat",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "sync:charahome-sdk": "node ./scripts/sync-charahome-sdk.mjs",
+    "dev": "npm run dev --workspace @charachat/api",
+    "dev:api": "npm run dev --workspace @charachat/api",
+    "start": "npm run start --workspace @charachat/api",
+    "start:api": "npm run start --workspace @charachat/api",
+    "build": "node ./scripts/run-workspaces.mjs build --if-present",
+    "lint": "node ./scripts/run-workspaces.mjs lint --if-present",
+    "test": "node ./scripts/run-workspaces.mjs test --if-present"
+  }
+}
+

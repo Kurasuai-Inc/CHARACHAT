@@ -1,0 +1,199 @@
+:root {
+  font-family: "Segoe UI", "Hiragino Sans", sans-serif;
+  color: #142126;
+  background:
+    radial-gradient(circle at top, rgba(190, 255, 241, 0.9), transparent 32%),
+    linear-gradient(180deg, #f7fffc 0%, #eef8f5 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.shell,
+.shellLoading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.shell__content {
+  width: min(480px, 100%);
+}
+
+.chat-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+}
+
+.sidebar,
+.chatPanel {
+  padding: 20px;
+}
+
+.sidebar {
+  background: rgba(255, 255, 255, 0.8);
+  border-right: 1px solid rgba(20, 33, 38, 0.08);
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.brandBlock,
+.composerActions,
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.eyebrow,
+.messageMeta,
+.muted {
+  color: #5f7b84;
+}
+
+.composerCard,
+.threadCard,
+.messageBubble,
+.status,
+.presencePill,
+.emptyState {
+  border-radius: 18px;
+}
+
+.composerCard,
+.emptyState {
+  background: rgba(255, 255, 255, 0.86);
+  padding: 16px;
+  border: 1px solid rgba(20, 33, 38, 0.08);
+}
+
+.threadList {
+  display: grid;
+  gap: 10px;
+}
+
+.threadCard {
+  border: 1px solid rgba(20, 33, 38, 0.08);
+  background: rgba(255, 255, 255, 0.76);
+  padding: 14px;
+  text-align: left;
+  display: grid;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.threadCard--active {
+  border-color: #24a182;
+  background: linear-gradient(180deg, #f1fffa 0%, #dff9ef 100%);
+}
+
+.chatPanel {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 16px;
+}
+
+.messagePane {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.messageBubble {
+  max-width: min(640px, 90%);
+  padding: 14px 16px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.messageBubble--user {
+  margin-left: auto;
+  background: linear-gradient(180deg, #24a182 0%, #1a866d 100%);
+  color: white;
+}
+
+.messageBubble--character {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(20, 33, 38, 0.08);
+}
+
+.composer {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(20, 33, 38, 0.08);
+  border-radius: 24px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.field {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(20, 33, 38, 0.12);
+  padding: 12px 14px;
+  background: white;
+}
+
+.field--textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.primary,
+.ghost {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.primary {
+  background: #15343a;
+  color: white;
+}
+
+.ghost {
+  background: rgba(20, 33, 38, 0.08);
+  color: #15343a;
+}
+
+.presencePill,
+.status {
+  background: rgba(36, 161, 130, 0.14);
+  color: #176b57;
+  padding: 8px 12px;
+}
+
+.stack {
+  display: grid;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .chat-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid rgba(20, 33, 38, 0.08);
+  }
+}

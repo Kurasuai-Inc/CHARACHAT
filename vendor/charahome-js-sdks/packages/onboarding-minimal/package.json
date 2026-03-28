@@ -1,0 +1,55 @@
+{
+  "name": "@kurasuai-inc/charahome-onboarding-minimal",
+  "version": "0.1.0",
+  "description": "Minimal mobile-first onboarding flow for CHARAHOME derived apps.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --external react --external @kurasuai-inc/charahome-auth",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --external react --external @kurasuai-inc/charahome-auth --watch",
+    "clean": "rimraf dist"
+  },
+  "peerDependencies": {
+    "@kurasuai-inc/charahome-auth": ">=0.1.0",
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@kurasuai-inc/charahome-auth": "file:../auth",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "react": "^18.0.0",
+    "rimraf": "^5.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "charahome",
+    "onboarding",
+    "mobile",
+    "auth",
+    "react"
+  ],
+  "author": "Kurasuai Inc.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kurasuai-Inc/CHARAHOME-JS-SDKs.git",
+    "directory": "packages/onboarding-minimal"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

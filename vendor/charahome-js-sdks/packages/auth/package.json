@@ -1,0 +1,68 @@
+{
+  "name": "@kurasuai-inc/charahome-auth",
+  "version": "0.3.0",
+  "description": "CHARAHOME Auth SDK - Firebase Auth utilities and CHARAHOME account linking",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.mjs",
+      "require": "./dist/react.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/react.tsx --format cjs,esm --dts --external react",
+    "dev": "tsup src/index.ts src/react.tsx --format cjs,esm --dts --external react --watch",
+    "clean": "rimraf dist"
+  },
+  "peerDependencies": {
+    "firebase": ">=10.0.0",
+    "react": ">=18.0.0"
+  },
+  "dependencies": {
+    "@kurasuai-inc/charahome-api": "file:../api"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "firebase": "^10.0.0",
+    "react": "^18.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "keywords": [
+    "charahome",
+    "auth",
+    "firebase",
+    "sdk",
+    "react"
+  ],
+  "author": "Kurasuai Inc.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kurasuai-Inc/CHARAHOME-JS-SDKs.git",
+    "directory": "packages/auth"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}
