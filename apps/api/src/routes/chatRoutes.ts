@@ -109,6 +109,29 @@ export async function registerChatRoutes(
     }
   });
 
+  app.get('/internal/threads/:threadId/messages', async (request, reply) => {
+    if (!requireInternalApiKey(request, reply)) {
+      return { ok: false, message: 'Unauthorized.' };
+    }
+    try {
+      const params = request.params as { threadId: string };
+      const query = request.query as { ownerCharahomeUid?: string };
+      return {
+        ok: true,
+        result: await chatThreadService.getMessagesForOwnerCharahomeUid(
+          ensureString(params.threadId, 'threadId'),
+          ensureString(query.ownerCharahomeUid, 'ownerCharahomeUid'),
+        ),
+      };
+    } catch (error) {
+      reply.code(400);
+      return {
+        ok: false,
+        message: error instanceof Error ? error.message : 'Failed to load internal thread messages.',
+      };
+    }
+  });
+
   app.get('/threads', async (request, reply) => {
     const session = await requireSession(authService, request, reply);
     if (!session) return;

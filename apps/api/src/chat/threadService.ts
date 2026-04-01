@@ -104,6 +104,18 @@ export class ChatThreadService {
     };
   }
 
+  async getMessagesForOwnerCharahomeUid(threadId: string, ownerCharahomeUid: string) {
+    const thread = await this.store.getThreadForOwner(threadId, ownerCharahomeUid);
+    if (!thread) {
+      throw new Error(`Thread ${threadId} was not found.`);
+    }
+    const messages = await this.store.listMessages(threadId, ownerCharahomeUid);
+    return {
+      thread,
+      messages,
+    };
+  }
+
   async sendMessage(threadId: string, input: ChatMessageInput, session: AuthenticatedSession): Promise<SendChatMessageResult> {
     const thread = await this.store.getThreadForOwner(threadId, session.charahomeUid);
     if (!thread) {
