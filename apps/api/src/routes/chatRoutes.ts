@@ -2,6 +2,8 @@ import { type ChatMessageInput, type ChatThreadInput } from '@charachat/domain';
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import { type RequestAuthService } from '../auth/requestAuth.js';
 import { type ChatThreadService } from '../chat/threadService.js';
+import { type OfficialCharacterActionCatalogService } from '../charahome/officialCharacterActionCatalog.js';
+import { type CharachatApiConfig } from '../config.js';
 
 function ensureString(value: unknown, fieldName: string) {
   if (typeof value !== 'string' || value.trim().length === 0) {
@@ -30,8 +32,48 @@ export async function registerChatRoutes(
   app: FastifyInstance,
   chatThreadService: ChatThreadService,
   authService: RequestAuthService,
+  config: CharachatApiConfig,
+  officialActionCatalogService: OfficialCharacterActionCatalogService,
 ) {
+  function requireInternalApiKey(request: FastifyRequest, reply: FastifyReply) {
+    const configured = config.charahomeInternalApiKey?.trim();
+    if (!configured) {
+      reply.code(503);
+      return false;
+    }
+    const received = typeof request.headers['x-internal-api-key'] === 'string'
+      ? request.headers['x-internal-api-key'].trim()
+      : '';
+    if (!received || received !== configured) {
+      reply.code(401);
+      return false;
+    }
+    return true;
+  }
+
   app.get('/health', async () => ({ ok: true }));
+
+  app.get('/internal/official-character-actions/catalog', async (request, reply) => {
+    if (!requireInternalApiKey(request, reply)) {
+      return { ok: false, message: 'Unauthorized.' };
+    }
+    try {
+      const query = request.query as { characterId?: string; ownerCharahomeUid?: string };
+      return {
+        ok: true,
+        actions: await officialActionCatalogService.listOfficialCharacterActions({
+          characterId: ensureString(query.characterId, 'characterId'),
+          ownerCharahomeUid: ensureString(query.ownerCharahomeUid, 'ownerCharahomeUid'),
+        }),
+      };
+    } catch (error) {
+      reply.code(400);
+      return {
+        ok: false,
+        message: error instanceof Error ? error.message : 'Failed to load official CHARACHAT CharacterActions.',
+      };
+    }
+  });
 
   app.get('/threads', async (request, reply) => {
     const session = await requireSession(authService, request, reply);
@@ -98,4 +140,3 @@ export async function registerChatRoutes(
     };
   });
 }
-

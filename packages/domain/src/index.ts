@@ -12,6 +12,8 @@ export interface ChatThread {
   metadata?: {
     sessionId?: string;
     lastDeskAttentionAtIso?: string;
+    lastBehaviorExecutionId?: string;
+    lastInboxItemId?: string;
   };
 }
 
@@ -40,9 +42,14 @@ export interface DeskAvailability {
   clientKinds: string[];
 }
 
+export type ChatInteractionDecisionType = 'reply_now' | 'reply_later' | 'no_reply' | 'notice_only';
+
 export interface SendChatMessageResult {
   thread: ChatThread;
   userMessage: ChatMessage;
-  replyMessage: ChatMessage;
+  replyMessage?: ChatMessage | null;
   deskAvailability: DeskAvailability;
+  interactionDecisionType?: ChatInteractionDecisionType;
+  inboxItemId?: string | null;
+  behaviorExecutionId?: string | null;
 }

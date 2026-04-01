@@ -50,6 +50,25 @@ function ChatWorkspace({
     setDeskAvailability(result.deskAvailability);
   };
 
+  const pollForReply = async (threadId: string, behaviorExecutionId: string, auth: ChatApiAuth) => {
+    for (let attempt = 0; attempt < 16; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      const result = await getThreadMessages(threadId, auth);
+      setMessages(result.messages);
+      setDeskAvailability(result.deskAvailability);
+      const found = result.messages.some((message) => (
+        message.sender === 'CHARACTER'
+        && message.metadata
+        && message.metadata.behaviorExecutionId === behaviorExecutionId
+      ));
+      if (found) {
+        setStatus(null);
+        return;
+      }
+    }
+    setStatus('キャラの返答待ちです。時間を置いて再読み込みしてください。');
+  };
+
   useEffect(() => {
     if (!charahomeUser || !derivedUser) return;
     void refreshThreads().catch((error) => {
@@ -99,9 +118,27 @@ function ChatWorkspace({
       const auth = await getApiAuth();
       const result = await sendThreadMessage(selectedThreadId, messageText.trim(), auth);
       setMessageText('');
-      setMessages((current) => [...current, result.userMessage, result.replyMessage]);
+      setMessages((current) => {
+        const next = [...current, result.userMessage];
+        if (result.replyMessage) {
+          next.push(result.replyMessage);
+        }
+        return next;
+      });
       setDeskAvailability(result.deskAvailability);
       setThreads((current) => [result.thread, ...current.filter((item) => item.id !== result.thread.id)]);
+      if (result.replyMessage) {
+        setStatus(null);
+      } else if (result.interactionDecisionType === 'reply_later') {
+        setStatus('キャラはあとで返す判断をしました。');
+      } else if (result.interactionDecisionType === 'notice_only') {
+        setStatus('新着として受け取りました。キャラが気づいたタイミングで反応します。');
+      } else if (result.interactionDecisionType === 'no_reply') {
+        setStatus('今回は返信しない判断でした。');
+      } else if (result.behaviorExecutionId) {
+        setStatus('キャラが返答を考えています。');
+        void pollForReply(selectedThreadId, result.behaviorExecutionId, auth);
+      }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Failed to send message.');
     } finally {
