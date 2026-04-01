@@ -3,6 +3,7 @@ import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fa
 import { type RequestAuthService } from '../auth/requestAuth.js';
 import { type ChatThreadService } from '../chat/threadService.js';
 import { type OfficialCharacterActionCatalogService } from '../charahome/officialCharacterActionCatalog.js';
+import { type OfficialCharacterActionExecutionService } from '../charahome/officialCharacterActionExecutionService.js';
 import { type CharachatApiConfig } from '../config.js';
 
 function ensureString(value: unknown, fieldName: string) {
@@ -34,6 +35,7 @@ export async function registerChatRoutes(
   authService: RequestAuthService,
   config: CharachatApiConfig,
   officialActionCatalogService: OfficialCharacterActionCatalogService,
+  officialActionExecutionService: OfficialCharacterActionExecutionService,
 ) {
   function requireInternalApiKey(request: FastifyRequest, reply: FastifyReply) {
     const configured = config.charahomeInternalApiKey?.trim();
@@ -71,6 +73,38 @@ export async function registerChatRoutes(
       return {
         ok: false,
         message: error instanceof Error ? error.message : 'Failed to load official CHARACHAT CharacterActions.',
+      };
+    }
+  });
+
+  app.post('/internal/official-character-actions/execute', async (request, reply) => {
+    if (!requireInternalApiKey(request, reply)) {
+      return { ok: false, message: 'Unauthorized.' };
+    }
+    try {
+      const body = (request.body ?? {}) as {
+        characterId?: string;
+        providerId?: string | null;
+        payload?: Record<string, unknown>;
+      };
+      const payload = body.payload && typeof body.payload === 'object' ? body.payload : null;
+      if (!payload) {
+        reply.code(400);
+        return { ok: false, message: 'payload is required.' };
+      }
+      return {
+        ok: true,
+        result: await officialActionExecutionService.execute({
+          characterId: ensureString(body.characterId, 'characterId'),
+          providerId: typeof body.providerId === 'string' ? body.providerId.trim() : null,
+          payload,
+        }),
+      };
+    } catch (error) {
+      reply.code(400);
+      return {
+        ok: false,
+        message: error instanceof Error ? error.message : 'Failed to execute official CHARACHAT CharacterAction.',
       };
     }
   });

@@ -6,7 +6,7 @@ import Fastify from 'fastify';
 import { FirebaseRequestAuthService, type RequestAuthService } from './auth/requestAuth.js';
 import { ChatThreadService } from './chat/threadService.js';
 import { OfficialCharacterActionCatalogService } from './charahome/officialCharacterActionCatalog.js';
-import { CharahomeRuntimeBridge } from './charahome/runtimeBridge.js';
+import { OfficialCharacterActionExecutionService } from './charahome/officialCharacterActionExecutionService.js';
 import { loadConfig, type CharachatApiConfig } from './config.js';
 import { canUseFirebaseAdmin, getAdminFirestore } from './firebaseAdmin.js';
 import { FirestoreChatThreadStore, FileChatThreadStore, type ChatThreadStore } from './chat/threadStore.js';
@@ -39,9 +39,16 @@ export async function buildServer(options: BuildServerOptions = {}) {
     : new FileChatThreadStore(`${config.dataDir.replace(/[\\/]$/, '')}/chat-store.json`);
   const chatThreadService = options.chatThreadService ?? new ChatThreadService(store, config);
   const officialActionCatalogService = new OfficialCharacterActionCatalogService(store);
-  const runtimeBridge = new CharahomeRuntimeBridge(config, store);
+  const officialActionExecutionService = new OfficialCharacterActionExecutionService(store);
 
-  await registerChatRoutes(app, chatThreadService, authService, config, officialActionCatalogService);
+  await registerChatRoutes(
+    app,
+    chatThreadService,
+    authService,
+    config,
+    officialActionCatalogService,
+    officialActionExecutionService,
+  );
 
   const webDistPath = path.resolve(__dirname, '../../web/dist');
   if (await directoryExists(webDistPath)) {
@@ -51,14 +58,6 @@ export async function buildServer(options: BuildServerOptions = {}) {
       wildcard: false,
     });
   }
-
-  app.addHook('onClose', async () => {
-    runtimeBridge.stop();
-  });
-
-  app.addHook('onReady', async () => {
-    runtimeBridge.start();
-  });
 
   return app;
 }
